@@ -14,6 +14,12 @@ Use this skill when the user asks for:
 - Seller-side payment verification and settlement
 - Buyer-side token approval, signing, and payment
 
+Use `meridian.md` instead when the integration goes
+through Meridian's facilitator and `/v1/settle` API.
+That is the managed path when you do not want to run
+your own settlement signer or call the Permit2 proxy
+directly.
+
 ## Verified MegaETH Contracts
 
 ### Mainnet (Chain ID: 4326)
@@ -178,6 +184,13 @@ async function settle(paymentPayload) {
 }
 ```
 
+This is the do-it-yourself path. If you do not want to
+run seller-side settlement infrastructure yourself,
+Meridian provides a hosted facilitator path where your
+server forwards `paymentPayload` and
+`paymentRequirements` to `/v1/settle` instead. See
+`meridian.md`.
+
 ## Buyer / Client Side
 
 ### One-Time Setup: Approve Permit2
@@ -222,6 +235,7 @@ When the client receives a 402, it signs a Permit2
 import { SignatureTransfer } from "@uniswap/permit2-sdk";
 
 const EXACT_PROXY = "0x402085c248EeA27D92E8b30b2C58ed07f9E20001";
+const PERMIT2 = "0x000000000022D473030F116dDEE9F6B43aC78BA3";
 
 function createPaymentSignature(
   paymentRequirements,
@@ -253,7 +267,7 @@ function createPaymentSignature(
   // Build EIP-712 typed data for signing
   const { domain, types, values } = SignatureTransfer.getPermitData(
     permit,
-    EXACT_PROXY,
+    PERMIT2,
     4326, // chainId
     witness,
     witnessType
@@ -262,6 +276,10 @@ function createPaymentSignature(
   return { permit, witness, domain, types, values };
 }
 ```
+
+The signer roles are split deliberately:
+- `permit.spender` is the x402 exact proxy that will consume the permit
+- `domain.verifyingContract` is the Permit2 contract that verifies the EIP-712 signature
 
 ### Full Buyer Flow
 
@@ -341,20 +359,19 @@ const receipt = await client.request({
 // Receipt returned inline — no polling needed
 ```
 
-## Legacy: Meridian / EIP-3009 Flow
+## Meridian-Specific Integrations
 
-Prior to the Permit2Proxy deployment, MegaETH x402
-payments used Meridian's EIP-3009 forwarder as a
-workaround. This flow is now **deprecated** in favor
-of the standard Permit2 path described above.
+This guide stays general-purpose and focuses on the
+standard MegaETH x402 Permit2 flow.
 
-If you encounter references to the Meridian facilitator
-(`0x8E7769D440b3460b92159Dd9C6D17302b036e2d6`) or the
-USDm forwarder (`0x2c2d8EF0664432BA243deF0b8f60aF7aB43a60B4`)
-in existing code, migrate to the Permit2 flow.
-
-See `meridian.md` for the legacy implementation details
-if you need to maintain backward compatibility.
+If you are integrating with Meridian specifically, use
+`meridian.md` for:
+- Meridian organization and API key setup
+- Managed seller-side settlement through `/v1/settle`
+- No need to operate your own settlement wallet or call
+  Permit2Proxy directly from your app backend
+- Meridian's facilitator-bound Permit2 flow on MegaETH
+- Meridian's legacy EIP-3009 / forwarder compatibility
 
 ## Common Mistakes
 
@@ -373,5 +390,8 @@ if you need to maintain backward compatibility.
    buyer's first payment will fail if they haven't
    approved Permit2 to spend their USDm.
 
-5. **Using EIP-3009 / Meridian for new integrations**:
-   Use the Permit2 flow. The Meridian path is legacy.
+5. **Using this guide for Meridian-specific wiring**:
+   Meridian is the managed alternative when you do not
+   want to self-settle. It uses its own
+   facilitator-backed flow and `/v1/settle` API. Use
+   `meridian.md` for Meridian integrations.
