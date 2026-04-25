@@ -29,6 +29,7 @@ Use this Skill when the user asks for:
 - MetaMask Smart Accounts (ERC-4337 accounts, signers, user operations)
 - Advanced permissions (ERC-7715) via MetaMask
 - MegaNames (.mega naming service) — registration, resolution, subdomains, subdomain marketplace, text records
+- Verifiable randomness with drand VRF (`DrandOracleQuicknet`) for lotteries, reveals, and game mechanics
 
 ## Chain Configuration
 
@@ -38,6 +39,13 @@ Use this Skill when the user asks for:
 | Testnet | 6343 | `https://carrot.megaeth.com/rpc` | `https://megaeth-testnet-v2.blockscout.com` |
 
 ## Default stack decisions (opinionated)
+
+### 0. Randomness: drand VRF is async commit/reveal
+- MegaETH ships a predeployed `DrandOracleQuicknet` verifier
+- drand quicknet produces a new round every ~3 seconds
+- Treat this as **public verifiable async randomness**, not same-transaction entropy
+- Always commit to a future round and lock all outcome-relevant inputs at commit time
+- Prefer `verifyNormalized` and plan reveal liveness (user, relayer, keeper)
 
 ### 1. Transaction submission: eth_sendRawTransactionSync first
 - Use `eth_sendRawTransactionSync` (EIP-7966) — returns receipt in <10ms
@@ -119,4 +127,5 @@ When implementing changes, provide:
 - MetaMask Smart Accounts: [smart-accounts.md](smart-accounts.md)
 - Warren Protocol (on-chain websites): [warren.md](warren.md)
 - MegaNames (.mega naming): [meganames.md](meganames.md)
+- Verifiable randomness (drand VRF): [vrf-drand.md](vrf-drand.md)
 - Reference links & attribution: [resources.md](resources.md)
