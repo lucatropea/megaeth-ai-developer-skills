@@ -15,6 +15,7 @@ This skill provides AI agents with deep knowledge of the MegaETH development eco
 - **Meridian**: x402 payments on MegaETH for seller/server and buyer/agent flows
 - **MegaNames**: .mega naming service — registration, resolution, subdomains, subdomain marketplace
 - **VRF / Randomness**: drand quicknet verifier integration for lotteries, reveals, and game mechanics
+- **Backed**: fundraising tied to an ERC-8004 agent — deploys Safe + time-capped collateral **Sale** + **AgentVaultToken** shares if the raise succeeds; post-raise treasury moves go through **AgentExecutor** under allowlist/selector policy (not a generic DAO stack)
 
 ## Installation
 
@@ -55,6 +56,7 @@ clawdhub install megaeth-developer
 ├── meganames.md              # MegaNames (.mega) — registration, resolution, subdomains, marketplace
 ├── warren.md                 # Warren Protocol — on-chain website hosting
 ├── vrf-drand.md              # drand VRF / verifiable randomness on MegaETH
+├── backed.md                 # Backed — agent-linked raises, Sale, vault shares, AgentExecutor on MegaETH
 └── resources.md              # Links, tools, explorers, bridges, DEX
 ```
 
@@ -93,6 +95,11 @@ Once installed, your AI agent will automatically use this skill when you ask abo
 "Register a .mega name and resolve it"
 "Set up subdomain sales with token gating"
 "Integrate MegaNames resolution into my dApp"
+"What is Backed on MegaETH?"
+"How does a Backed raise work from createAgentRaise to claim?"
+"Integrate AgentRaiseFactory and Sale commit/finalize from my dApp"
+"When does claim mint shares vs refund collateral on Backed?"
+"Configure AgentExecutor allowlist and selectors on MegaETH"
 ```
 
 ## Key Concepts
